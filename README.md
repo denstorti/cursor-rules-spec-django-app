@@ -1,3 +1,6 @@
+# THIS IS A LEARNING PROJECT
+This is a learning project to play around with Cursor rules, devbox CLI and spec-driven code generation with Cursor.
+
 # Freelancer Marketplace Platform
 
 A comprehensive web application that connects freelancers with clients who need their services. This platform enables user registration, profile management, job posting, application processes, and more.
