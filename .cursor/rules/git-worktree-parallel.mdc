@@ -1,7 +1,7 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+description: Run multiple Cursor Composer AI agents in parallel using Git worktrees to work on different branches simultaneously
+globs: ["*.git", "**/.git/**", "**/package.json"]
+alwaysApply: true
 ---
 # Git Worktree for Parallel Cursor AI Agents
 
