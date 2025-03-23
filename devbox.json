@@ -8,7 +8,7 @@
       "  echo 'Setting up development environment for the first time...'",
       "  cd freelancer_marketplace",
       "  python -m venv venv",
-      "  source venv/bin/activate",
+      "  source ./venv/bin/activate",
       "  pip install -r requirements.txt",
       "  echo 'Development environment set up successfully!'",
       "  cd ..",
@@ -20,33 +20,33 @@
       "setup": [
         "cd freelancer_marketplace",
         "python -m venv venv",
-        "source venv/bin/activate",
+        "source ./venv/bin/activate",
         "pip install -r requirements.txt",
         "echo 'Development environment set up successfully!'"
       ],
       "run-dev": [
         "cd freelancer_marketplace",
-        "source venv/bin/activate",
+        "source ./venv/bin/activate",
         "python manage.py runserver"
       ],
       "migrate": [
         "cd freelancer_marketplace",
-        "source venv/bin/activate",
+        "source ./venv/bin/activate",
         "python manage.py migrate"
       ],
       "makemigrations": [
         "cd freelancer_marketplace",
-        "source venv/bin/activate",
+        "source ./venv/bin/activate",
         "python manage.py makemigrations"
       ],
       "test": [
         "cd freelancer_marketplace",
-        "source venv/bin/activate",
+        "source ./venv/bin/activate",
         "python manage.py test"
       ],
       "lint": [
         "cd freelancer_marketplace",
-        "source venv/bin/activate",
+        "source ./venv/bin/activate",
         "python -m flake8"
       ]
     }
