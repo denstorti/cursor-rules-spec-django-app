@@ -3,20 +3,14 @@
   "packages": [],
   "shell": {
     "init_hook": [
-      "echo 'Welcome to the Freelancer Marketplace development environment!'",
-      "if [ ! -d \"freelancer_marketplace/venv\" ]; then",
-      "  echo 'Setting up development environment for the first time...'",
-      "  cd freelancer_marketplace",
-      "  python -m venv venv",
-      "  source \"$PWD/venv/bin/activate\"",
-      "  pip install -r requirements.txt",
-      "  echo 'Development environment set up successfully!'",
-      "  cd ..",
-      "else",
-      "  echo 'Development environment already set up. Use \"devbox run run-dev\" to start the server.'",
-      "fi"
+      "echo 'Welcome to the Freelancer Marketplace development environment!'"
     ],
     "scripts": {
+      "activate-venv": [
+        "cd freelancer_marketplace",
+        "source \"$PWD/venv/bin/activate\"",
+        "echo 'Virtual environment activated. You are now in the freelancer_marketplace directory.'"
+      ],
       "setup": [
         "cd freelancer_marketplace",
         "python -m venv venv",
