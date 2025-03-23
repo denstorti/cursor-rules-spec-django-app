@@ -1,0 +1,283 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Git Worktree for Parallel Cursor AI Agents
+
+This rule provides functionality to leverage Git worktrees for running multiple Cursor Composer AI agents in parallel, each working on separate branches simultaneously.
+
+## Overview
+
+Git worktrees allow you to work with multiple branches of a repository simultaneously by creating separate working directories linked to the same repository. This rule provides ZSH functions to:
+
+1. Create multiple worktrees (and branches) in parallel
+2. Launch Cursor in each worktree
+3. Merge a selected branch back to main and clean up all worktrees
+
+## ZSH Functions
+
+Add these functions to your `.zshrc` file:
+
+```zsh
+# wtree: Create a new worktree for each given branch
+# Usage: wtree [ -p|--pnpm ] branch1 branch2 ...
+#
+# This function does the following:
+#   1. Parses command-line arguments; if -p/--pnpm is provided, it will run "pnpm install"
+#   2. Determines the current branch and repository root
+#   3. For each branch passed:
+#      - Creates a worktree in ~/dev/<repoName>-<branch>
+#      - Optionally installs dependencies
+#      - Opens Cursor in the new worktree
+wtree() {
+  # Flag to determine whether to run "pnpm install"
+  local install_deps=false
+  local branches=()
+
+  # Parse command-line arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -p|--pnpm)
+        install_deps=true
+        shift
+        ;;
+      *)
+        branches+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  # Ensure at least one branch name is provided
+  if [[ ${#branches[@]} -eq 0 ]]; then
+    echo "Usage: wtree [ -p|--pnpm ] branch1 branch2 ..."
+    return 1
+  fi
+
+  # Determine the current branch; exit if not in a git repository
+  local current_branch
+  current_branch=$(git rev-parse --abbrev-ref HEAD) || {
+    echo "Error: Not a git repository."
+    return 1
+  }
+
+  # Determine repository root and name
+  local repo_root repo_name
+  repo_root=$(git rev-parse --show-toplevel) || {
+    echo "Error: Cannot determine repository root."
+    return 1
+  }
+  repo_name=$(basename "$repo_root")
+
+  # Set fixed parent directory for worktrees
+  local worktree_parent="$HOME/dev"
+  # Ensure the worktree parent directory exists
+  if [[ ! -d "$worktree_parent" ]]; then
+    if ! mkdir -p "$worktree_parent"; then
+      echo "Error: Failed to create worktree parent directory: $worktree_parent"
+      return 1
+    fi
+  fi
+
+  # Loop over each branch provided as argument
+  for branch in "${branches[@]}"; do
+    # Define the target path using a naming convention: <repoName>-<branch>
+    local target_path="$worktree_parent/${repo_name}-${branch}"
+    
+    echo "Processing branch: ${branch}"
+
+    # Check if a worktree already exists at the target path
+    if git worktree list | grep -q "^${target_path}[[:space:]]"; then
+      echo "Error: Worktree already exists at ${target_path}. Skipping branch '${branch}'."
+      continue
+    fi
+
+    # Check if the branch exists, if not create it from the current branch
+    if ! git show-ref --verify --quiet "refs/heads/${branch}"; then
+      echo "Creating new branch '${branch}' from '${current_branch}'..."
+      if ! git branch "${branch}" "${current_branch}"; then
+        echo "Error: Failed to create branch '${branch}'. Skipping."
+        continue
+      fi
+    fi
+
+    # Create the worktree
+    echo "Creating worktree for branch '${branch}' at ${target_path}..."
+    if ! git worktree add "${target_path}" "${branch}"; then
+      echo "Error: Failed to create worktree at ${target_path}. Skipping branch '${branch}'."
+      continue
+    fi
+
+    # If requested, install dependencies
+    if [[ "$install_deps" = true ]]; then
+      echo "Installing dependencies in worktree for branch '${branch}'..."
+      (cd "${target_path}" && pnpm install) || {
+        echo "Warning: Dependency installation failed in worktree for branch '${branch}'."
+      }
+    fi
+
+    # Open Cursor in the new worktree if the 'cursor' command is available
+    if command -v cursor >/dev/null 2>&1; then
+      echo "Opening Cursor in worktree for branch '${branch}'..."
+      cursor "${target_path}" &
+    else
+      echo "Worktree created at ${target_path}. Open Cursor manually."
+    fi
+  done
+
+  echo "Worktree setup complete for branches: ${branches[*]}"
+}
+
+# wtmerge: Merge a branch into main and clean up all worktrees
+# Usage: wtmerge branch_to_keep
+#
+# This function:
+#   1. Checks for uncommitted changes in the branch to keep
+#   2. Switches to main in the main worktree
+#   3. Merges the selected branch into main
+#   4. Removes all worktrees and deletes temporary branches
+wtmerge() {
+  # Ensure a branch name is provided
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: wtmerge branch_to_keep"
+    return 1
+  fi
+
+  local branch_to_keep="$1"
+  local repo_root repo_name
+  
+  # Determine repository root and name
+  repo_root=$(git rev-parse --show-toplevel) || {
+    echo "Error: Not a git repository."
+    return 1
+  }
+  repo_name=$(basename "$repo_root")
+
+  # Set fixed parent directory for worktrees
+  local worktree_parent="$HOME/dev"
+
+  # Get list of active worktrees that match our naming pattern
+  local worktrees=()
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^"$worktree_parent/${repo_name}-" ]]; then
+      worktrees+=("$line")
+    fi
+  done < <(git worktree list | awk '{print $1}')
+
+  if [[ ${#worktrees[@]} -eq 0 ]]; then
+    echo "No active worktrees found under ${worktree_parent}."
+    return 1
+  fi
+
+  # Check that the target branch worktree exists
+  local target_worktree=""
+  for wt in "${worktrees[@]}"; do
+    if [[ "$wt" == "$worktree_parent/${repo_name}-${branch_to_keep}" ]]; then
+      target_worktree="$wt"
+      break
+    fi
+  done
+
+  if [[ -z "$target_worktree" ]]; then
+    echo "Error: No active worktree found for branch '${branch_to_keep}'."
+    return 1
+  fi
+
+  # Check for uncommitted changes in worktree for branch to keep
+  echo "Checking for uncommitted changes in worktree for branch '${branch_to_keep}'..."
+  if ! ( cd "$target_worktree" && git diff --quiet && git diff --cached --quiet ); then
+    echo "Changes detected in branch '${branch_to_keep}'. Attempting auto-commit..."
+    if ! ( cd "$target_worktree" &&
+            git add . &&
+            git commit -m "chore: auto-commit changes in '${branch_to_keep}' before merge" ); then
+      echo "Error: Auto-commit failed in branch '${branch_to_keep}'. Aborting merge."
+      return 1
+    else
+      echo "Auto-commit successful in branch '${branch_to_keep}'."
+    fi
+  else
+    echo "No uncommitted changes found in branch '${branch_to_keep}'."
+  fi
+
+  # Switch to main branch in the main worktree
+  echo "Switching to 'main' branch in the main worktree..."
+  if ! git checkout main; then
+    echo "Error: Failed to switch to 'main' branch."
+    return 1
+  fi
+
+  # Merge the target branch into main
+  echo "Merging branch '${branch_to_keep}' into 'main'..."
+  if ! git merge "${branch_to_keep}" -m "feat: merge changes from '${branch_to_keep}'"; then
+    echo "Error: Merge failed. Please resolve conflicts and try again."
+    return 1
+  fi
+
+  # Remove all worktrees that were created via wtree()
+  echo "Cleaning up worktrees and deleting temporary branches..."
+  for wt in "${worktrees[@]}"; do
+    # Extract branch name from worktree path
+    local wt_branch
+    wt_branch=$(basename "$wt")
+    wt_branch=${wt_branch#${repo_name}-}  # Remove the repo name prefix
+
+    echo "Processing worktree for branch '${wt_branch}' at ${wt}..."
+    
+    # Remove the worktree using --force to ensure removal
+    if git worktree remove "$wt" --force; then
+      echo "Worktree at ${wt} removed."
+    else
+      echo "Warning: Failed to remove worktree at ${wt}."
+    fi
+
+    # Do not delete the 'main' branch
+    if [[ "$wt_branch" != "main" ]]; then
+      if git branch -D "$wt_branch"; then
+        echo "Branch '${wt_branch}' deleted."
+      else
+        echo "Warning: Failed to delete branch '${wt_branch}'."
+      fi
+    fi
+  done
+
+  echo "Merge complete: Branch '${branch_to_keep}' merged into 'main', and all worktrees cleaned up."
+}
+```
+
+## Usage Instructions
+
+1. **Add Functions to .zshrc**: Copy and paste the ZSH functions above into your `.zshrc` file.
+
+2. **Reload Your Shell**: Run `source ~/.zshrc` to load the new functions.
+
+3. **Create Multiple Worktrees**:
+   ```
+   wtree featureA featureB featureC
+   ```
+   
+   Add `-p` to install dependencies with PNPM:
+   ```
+   wtree -p featureA featureB featureC
+   ```
+
+4. **Assign Tasks to Composer**: In each Cursor instance, use Composer to work on specific tasks.
+
+5. **Choose the Best Solution**: Once you've identified which branch has the best solution:
+   ```
+   wtmerge featureA
+   ```
+   This merges `featureA` into `main` and cleans up all worktrees.
+
+## Customization
+
+- **Package Manager**: The default is PNPM. Modify the functions to use npm, yarn, etc.
+- **Worktree Location**: The default parent directory is `~/dev`. Change `worktree_parent` to your preferred location.
+- **Branch Naming**: Follow your team's branch naming conventions when creating worktrees.
+
+## Benefits
+
+- Run multiple Composer AI agents in parallel on different approaches
+- Work on multiple features simultaneously without conflicts
+- Quickly compare different implementations of the same feature
+- Maintain a clean workspace with automated cleanup 
