@@ -28,11 +28,11 @@
                     {% if user.is_authenticated %}
                         {% if user.is_freelancer %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Find Jobs</a>
+                                <a class="nav-link" href="{% url 'jobs:job_list' %}">Find Jobs</a>
                             </li>
                         {% elif user.is_hirer %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Post a Job</a>
+                                <a class="nav-link" href="{% url 'jobs:job_create' %}">Post a Job</a>
                             </li>
                         {% endif %}
                     {% endif %}
@@ -50,9 +50,9 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'profile' %}">My Profile</a></li>
                                 {% if user.is_freelancer %}
-                                    <li><a class="dropdown-item" href="#">My Applications</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'jobs:my_applications' %}">My Applications</a></li>
                                 {% elif user.is_hirer %}
-                                    <li><a class="dropdown-item" href="#">My Jobs</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'jobs:my_jobs' %}">My Jobs</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>

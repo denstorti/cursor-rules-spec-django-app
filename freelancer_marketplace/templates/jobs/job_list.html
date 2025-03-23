@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Browse Jobs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar with filters -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Find Jobs</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'jobs:job_search' %}">
+                        <div class="mb-3">
+                            <label for="id_q" class="form-label">{{ search_form.q.label }}</label>
+                            {{ search_form.q }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_category" class="form-label">{{ search_form.category.label }}</label>
+                            {{ search_form.category }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_skills" class="form-label">{{ search_form.skills.label }}</label>
+                            {{ search_form.skills }}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_budget_min" class="form-label">{{ search_form.budget_min.label }}</label>
+                                {{ search_form.budget_min }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_budget_max" class="form-label">{{ search_form.budget_max.label }}</label>
+                                {{ search_form.budget_max }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ search_form.is_remote }}
+                                <label class="form-check-label" for="id_is_remote">
+                                    {{ search_form.is_remote.label }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_experience_level" class="form-label">{{ search_form.experience_level.label }}</label>
+                            {{ search_form.experience_level }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_sort" class="form-label">{{ search_form.sort.label }}</label>
+                            {{ search_form.sort }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Categories</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for category in categories %}
+                            <li class="list-group-item">
+                                <a href="{% url 'jobs:category_detail' category.slug %}" class="text-decoration-none">
+                                    {{ category.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Popular Skills</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for skill in popular_skills %}
+                            <a href="?skills={{ skill.id }}" class="badge bg-light text-dark text-decoration-none">
+                                {{ skill.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Job listings -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Available Jobs</h2>
+                
+                {% if user.is_authenticated and user.is_hirer %}
+                    <a href="{% url 'jobs:job_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Post a Job
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if jobs %}
+                <div class="card mb-4">
+                    <div class="card-header bg-transparent">
+                        <p class="mb-0">Found {{ paginator.count }} jobs matching your criteria</p>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for job in jobs %}
+                            <div class="list-group-item p-3">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-1">
+                                        <a href="{% url 'jobs:job_detail' job.pk %}" class="text-decoration-none">
+                                            {{ job.title }}
+                                        </a>
+                                    </h5>
+                                    <small class="text-muted">Posted {{ job.created_at|timesince }} ago</small>
+                                </div>
+                                
+                                <div class="mb-1">
+                                    {% if job.category %}
+                                        <span class="badge bg-secondary">{{ job.category.name }}</span>
+                                    {% endif %}
+                                    {% if job.is_remote %}
+                                        <span class="badge bg-info">Remote</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">On-site: {{ job.location }}</span>
+                                    {% endif %}
+                                    <span class="badge bg-primary">{{ job.get_experience_level_display }}</span>
+                                </div>
+                                
+                                <p class="mb-1 text-truncate">{{ job.description|striptags|truncatechars:150 }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div>
+                                        <strong>Budget:</strong>
+                                        {% if job.fixed_budget %}
+                                            ${{ job.fixed_budget }}
+                                        {% elif job.budget_min and job.budget_max %}
+                                            ${{ job.budget_min }} - ${{ job.budget_max }}
+                                        {% elif job.budget_min %}
+                                            From ${{ job.budget_min }}
+                                        {% elif job.budget_max %}
+                                            Up to ${{ job.budget_max }}
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        {% if job.deadline %}
+                                            <small class="text-danger">
+                                                <i class="bi bi-clock"></i> 
+                                                Deadline: {{ job.deadline|date:"M d, Y" }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    {% for skill in job.skills.all %}
+                                        <span class="badge bg-light text-dark">{{ skill.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                {% include "includes/pagination.html" with page_obj=page_obj %}
+                
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No jobs found matching your criteria.
+                    Try adjusting your search filters.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+</script>
+{% endblock %} 
