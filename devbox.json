@@ -4,44 +4,38 @@
     "python@3.11",
     "python310Packages.pip@latest",
     "python310Packages.virtualenv@latest",
-    "ripgrep@latest"
+    "pipenv"
   ],
   "shell": {
     "init_hook": [
-      "echo 'Welcome to the Freelancer Marketplace development environment!'"
+      "echo 'Welcome to the Freelancer Marketplace development environment!'",
+      "pipenv shell"
     ],
     "scripts": {
       "setup": [
         "cd freelancer_marketplace",
-        "python -m venv venv",
-        "source \"$PWD/venv/bin/activate\"",
         "pip install -r requirements.txt",
         "echo 'Development environment set up successfully!'"
       ],
       "run-dev": [
         "cd freelancer_marketplace",
-        "source \"$PWD/venv/bin/activate\"",
-        "python manage.py runserver"
+        "make run"
       ],
       "migrate": [
         "cd freelancer_marketplace",
-        "source \"$PWD/venv/bin/activate\"",
-        "python manage.py migrate"
+        "make migrations"
       ],
       "makemigrations": [
         "cd freelancer_marketplace",
-        "source \"$PWD/venv/bin/activate\"",
-        "python manage.py makemigrations"
+        "make app-migrations"
       ],
       "test": [
         "cd freelancer_marketplace",
-        "source \"$PWD/venv/bin/activate\"",
-        "python manage.py test"
+        "make test"
       ],
       "lint": [
         "cd freelancer_marketplace",
-        "source \"$PWD/venv/bin/activate\"",
-        "python -m flake8"
+        "make lint"
       ]
     }
   }
