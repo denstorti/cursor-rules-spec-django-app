@@ -70,12 +70,11 @@ We use [Devbox](https://www.jetify.com/devbox/) to manage development tools cons
 1. Install Devbox following the [official installation instructions](https://www.jetify.com/devbox/docs/installing_devbox/)
 2. Clone the repository
 3. Run `devbox shell` to enter the development environment
-4. Set up the project: `devbox run setup`
-5. Run migrations: `devbox run migrate`
-6. Start the development server: `devbox run run-dev`
+   - The setup process will run automatically on first shell entry
+4. Start the development server: `devbox run run-dev`
 
 Available Devbox commands:
-- `devbox run setup` - Set up the development environment
+- `devbox run setup` - Manually set up the development environment (if needed)
 - `devbox run run-dev` - Start the development server
 - `devbox run migrate` - Apply database migrations
 - `devbox run makemigrations` - Create new migrations

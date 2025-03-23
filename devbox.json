@@ -1,18 +1,53 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.0/.schema/devbox.schema.json",
-  "packages": [
-    "python@3.11",
-    "python310Packages.pip@latest",
-    "python310Packages.virtualenv@latest",
-    "ripgrep@latest"
-  ],
+  "packages": [],
   "shell": {
     "init_hook": [
-      "echo 'Welcome to devbox!' > /dev/null"
+      "echo 'Welcome to the Freelancer Marketplace development environment!'",
+      "if [ ! -d \"freelancer_marketplace/venv\" ]; then",
+      "  echo 'Setting up development environment for the first time...'",
+      "  cd freelancer_marketplace",
+      "  python -m venv venv",
+      "  source venv/bin/activate",
+      "  pip install -r requirements.txt",
+      "  echo 'Development environment set up successfully!'",
+      "  cd ..",
+      "else",
+      "  echo 'Development environment already set up. Use \"devbox run run-dev\" to start the server.'",
+      "fi"
     ],
     "scripts": {
+      "setup": [
+        "cd freelancer_marketplace",
+        "python -m venv venv",
+        "source venv/bin/activate",
+        "pip install -r requirements.txt",
+        "echo 'Development environment set up successfully!'"
+      ],
+      "run-dev": [
+        "cd freelancer_marketplace",
+        "source venv/bin/activate",
+        "python manage.py runserver"
+      ],
+      "migrate": [
+        "cd freelancer_marketplace",
+        "source venv/bin/activate",
+        "python manage.py migrate"
+      ],
+      "makemigrations": [
+        "cd freelancer_marketplace",
+        "source venv/bin/activate",
+        "python manage.py makemigrations"
+      ],
       "test": [
-        "echo \"Error: no test specified\" && exit 1"
+        "cd freelancer_marketplace",
+        "source venv/bin/activate",
+        "python manage.py test"
+      ],
+      "lint": [
+        "cd freelancer_marketplace",
+        "source venv/bin/activate",
+        "python -m flake8"
       ]
     }
   }
