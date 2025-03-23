@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # Conventional Commit Message Generator
 
@@ -49,4 +49,4 @@ Based on staged changes, it might generate messages like:
 
 ## Implementation
 
-The rule uses git diff to analyze staged changes and suggests appropriate commit types and messages based on the nature of the changes. 
+The rule uses git diff to analyze staged changes and suggests appropriate commit types and messages based on the nature of the changes.
