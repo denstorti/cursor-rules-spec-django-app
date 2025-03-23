@@ -46,6 +46,7 @@ This platform creates a marketplace where:
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap 5
 - **Authentication**: Django Authentication System
 - **Containerization**: Docker and Docker Compose
+- **Development Tools**: Managed with Devbox
 
 ## Project Structure
 
@@ -62,7 +63,26 @@ freelancer_marketplace/       # Main application folder
 
 ## Getting Started
 
-### With Docker (Recommended)
+### With Devbox (For Development)
+
+We use [Devbox](https://www.jetify.com/devbox/) to manage development tools consistently across environments.
+
+1. Install Devbox following the [official installation instructions](https://www.jetify.com/devbox/docs/installing_devbox/)
+2. Clone the repository
+3. Run `devbox shell` to enter the development environment
+4. Set up the project: `devbox run setup`
+5. Run migrations: `devbox run migrate`
+6. Start the development server: `devbox run run-dev`
+
+Available Devbox commands:
+- `devbox run setup` - Set up the development environment
+- `devbox run run-dev` - Start the development server
+- `devbox run migrate` - Apply database migrations
+- `devbox run makemigrations` - Create new migrations
+- `devbox run test` - Run tests
+- `devbox run lint` - Run linting
+
+### With Docker (Recommended for Local Testing)
 
 1. Clone the repository
 2. Run `docker-compose up --build`
@@ -70,7 +90,7 @@ freelancer_marketplace/       # Main application folder
 4. Create superuser: `docker-compose exec web python manage.py createsuperuser`
 5. Access at http://localhost:8000/
 
-### Local Development
+### Manual Setup
 
 1. Create virtual environment: `python -m venv venv`
 2. Activate: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
@@ -97,6 +117,7 @@ Detailed documentation for each component can be found in the `specs/` directory
 - Features should have comprehensive unit tests
 - Local development uses containerized dependencies with Docker
 - Follow Django best practices
+- Use Devbox for consistent development tooling
 
 ## License
 
