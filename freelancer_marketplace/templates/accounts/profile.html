@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Freelancer Marketplace{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Profile Information</h4>
+            </div>
+            <div class="card-body text-center">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle img-thumbnail mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-light rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 150px; height: 150px;">
+                        <span class="display-4 text-secondary">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                    </div>
+                {% endif %}
+                
+                <h3>{{ user.get_full_name }}</h3>
+                <p class="text-muted">{{ user.get_role_display }}</p>
+                <p><i class="bi bi-envelope"></i> {{ user.email }}</p>
+                
+                <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {% if user.is_freelancer %}
+                        Professional Information
+                    {% elif user.is_hirer %}
+                        Company Information
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if user.is_freelancer %}
+                    <h5>Skills</h5>
+                    <p>{{ profile.skills|default:"No skills listed yet." }}</p>
+                    
+                    <h5>Experience</h5>
+                    <p>{{ profile.experience|default:"No experience listed yet." }}</p>
+                    
+                    <h5>Portfolio</h5>
+                    {% if profile.portfolio %}
+                        <p><a href="{{ profile.portfolio }}" target="_blank">{{ profile.portfolio }}</a></p>
+                    {% else %}
+                        <p>No portfolio URL provided.</p>
+                    {% endif %}
+                    
+                    <h5>Hourly Rate</h5>
+                    <p>{{ profile.rate_expectations|default:"Not specified" }}</p>
+                    
+                    <h5>Availability</h5>
+                    <p>{{ profile.get_availability_status_display }}</p>
+                    
+                {% elif user.is_hirer %}
+                    <h5>Company</h5>
+                    <p>{{ profile.company_name|default:"No company name provided." }}</p>
+                    
+                    <h5>Industry</h5>
+                    <p>{{ profile.industry|default:"No industry specified." }}</p>
+                    
+                    <h5>Company Size</h5>
+                    <p>{{ profile.get_company_size_display|default:"Not specified" }}</p>
+                    
+                    <h5>Website</h5>
+                    {% if profile.website %}
+                        <p><a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></p>
+                    {% else %}
+                        <p>No website provided.</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Account Statistics</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <h2 class="text-primary">0</h2>
+                        {% if user.is_freelancer %}
+                            <p>Applications</p>
+                        {% elif user.is_hirer %}
+                            <p>Posted Jobs</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <h2 class="text-primary">0</h2>
+                        <p>Active Contracts</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <h2 class="text-primary">0</h2>
+                        <p>Reviews</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Freelancer Marketplace{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-5">
+        <h1 class="display-4">Find the Perfect Match</h1>
+        <p class="lead">
+            {% if user.is_authenticated %}
+                {% if user.is_freelancer %}
+                    Discover job opportunities that match your skills and expertise.
+                {% elif user.is_hirer %}
+                    Find skilled freelancers for your projects and tasks.
+                {% endif %}
+            {% else %}
+                Connect freelancers with job opportunities and help businesses find talent.
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="row mb-5">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title">Looking for Work?</h3>
+                <p class="card-text">Find projects that match your skills and experience. Build your portfolio and connect with potential clients.</p>
+                <a href="{% url 'register' %}" class="btn btn-primary">Join as Freelancer</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title">Need to Hire?</h3>
+                <p class="card-text">Post jobs and find talented professionals for your projects. Review candidates and hire the best match.</p>
+                <a href="{% url 'register' %}" class="btn btn-primary">Join as Hirer</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Welcome back, {{ user.get_full_name|default:user.username }}!</h3>
+                <p class="card-text">
+                    {% if user.is_freelancer %}
+                        Continue exploring job opportunities that match your skills and expertise.
+                    {% elif user.is_hirer %}
+                        Continue finding skilled freelancers for your projects and tasks.
+                    {% endif %}
+                </p>
+                {% if user.is_freelancer %}
+                    <a href="#" class="btn btn-primary">Browse Jobs</a>
+                {% elif user.is_hirer %}
+                    <a href="#" class="btn btn-primary">Post a Job</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2 class="text-center mb-4">How It Works</h2>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary mb-3">1</h1>
+                <h5 class="card-title">Create Your Profile</h5>
+                <p class="card-text">Sign up and build your professional profile showcasing your skills and experience.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary mb-3">2</h1>
+                <h5 class="card-title">Connect and Communicate</h5>
+                <p class="card-text">Find the right match and communicate directly through our messaging system.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary mb-3">3</h1>
+                <h5 class="card-title">Work and Get Paid</h5>
+                <p class="card-text">Complete projects, manage contracts, and receive secure payments for your work.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

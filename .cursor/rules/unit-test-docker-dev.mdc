@@ -1,0 +1,88 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Feature Unit Testing and Local Docker Development Requirements
+
+This rule establishes requirements for feature development:
+1. All features must have comprehensive unit tests
+2. Local development must use containerized dependencies with Docker
+
+## Unit Testing Requirements
+
+### Test Coverage
+- Every new feature must have unit tests that cover at least 90% of the code
+- All edge cases must be tested
+- Tests must verify both success and failure paths
+
+### Test Implementation
+- Use Django's TestCase for database-related tests
+- Use SimpleTestCase for tests that don't require database access
+- Follow the Arrange-Act-Assert pattern in test methods
+- Name test methods clearly using `test_<function_name>_<scenario>`
+
+### Test Verification
+- All tests must pass before submitting a PR
+- Include test coverage reports in PR descriptions
+- Tests should run quickly (<10 seconds per test file)
+
+## Local Development with Docker
+
+### Docker Setup
+- Use Docker Compose for local development environment
+- Create separate containers for:
+  - Django application
+  - PostgreSQL/MySQL database
+  - Redis (if needed)
+  - Any other external services
+
+### Database Configuration
+- Replace production database connections with containerized equivalents
+- Use environment variables for connection strings
+- Include seed data scripts for development
+
+### Example docker-compose.yml
+```yaml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+  
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+
+volumes:
+  postgres_data:
+```
+
+### Implementation Guidelines
+- All dependencies should be containerized
+- Use environment variables for configuration
+- Include setup scripts in the repository
+- Document any special setup requirements
+
+## Verification Checklist
+
+- [ ] Unit tests implemented for new feature
+- [ ] Test coverage meets or exceeds 90%
+- [ ] All tests pass locally
+- [ ] Docker setup works for local development
+- [ ] Documentation updated 
