@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Conventional Commit Message Generator
+
+This rule helps generate conventional commit messages for staged changes in your working directory.
+
+## Usage
+
+When you have files staged for commit, this rule will:
+1. Analyze the staged changes
+2. Suggest a conventional commit message based on the changes
+3. Format the message according to the Conventional Commits specification
+
+## Conventional Commit Types
+
+The rule will suggest one of these types based on the changes:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, missing semi colons, etc)
+- `refactor`: Code changes that neither fix a bug nor add a feature
+- `perf`: Performance improvements
+- `test`: Adding or modifying tests
+- `build`: Changes to build system or external dependencies
+- `ci`: Changes to CI configuration files and scripts
+- `chore`: Other changes that don't modify source or test files
+
+## Message Format
+
+The generated message will follow this format:
+```
+type(scope?): subject
+
+[optional body]
+
+[optional footer(s)]
+```
+
+## Examples
+
+Based on staged changes, it might generate messages like:
+- `feat(auth): add OAuth2 login support`
+- `fix(api): handle null response in user endpoint`
+- `docs(readme): update installation instructions`
+- `style(components): fix indentation in Button component`
+
+## Implementation
+
+The rule uses git diff to analyze staged changes and suggests appropriate commit types and messages based on the nature of the changes. 
