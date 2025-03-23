@@ -55,9 +55,9 @@
                     {% endif %}
                 </p>
                 {% if user.is_freelancer %}
-                    <a href="#" class="btn btn-primary">Browse Jobs</a>
+                    <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Browse Jobs</a>
                 {% elif user.is_hirer %}
-                    <a href="#" class="btn btn-primary">Post a Job</a>
+                    <a href="{% url 'jobs:job_create' %}" class="btn btn-primary">Post a Job</a>
                 {% endif %}
             </div>
         </div>

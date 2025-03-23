@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0 fs-4">{{ title }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Form Error</h5>
+                                <p>Please fix the errors below.</p>
+                                {% if form.non_field_errors %}
+                                    <ul class="mb-0">
+                                        {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Basic Information</h3>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="text-danger">{{ form.title.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="text-danger">{{ form.description.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Markdown is supported for formatting.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Categorization -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Categorization</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="text-danger">{{ form.category.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.skills.id_for_label }}" class="form-label">{{ form.skills.label }}</label>
+                                    {{ form.skills }}
+                                    {% if form.skills.errors %}
+                                        <div class="text-danger">{{ form.skills.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ form.new_skills.id_for_label }}" class="form-label">{{ form.new_skills.label }}</label>
+                                    {{ form.new_skills }}
+                                    <div class="form-text">{{ form.new_skills.help_text }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Budget & Timeline -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Budget & Timeline</h3>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.fixed_budget.id_for_label }}" class="form-label">{{ form.fixed_budget.label }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        {{ form.fixed_budget }}
+                                    </div>
+                                    <div class="form-text">{{ form.fixed_budget.help_text }}</div>
+                                    {% if form.fixed_budget.errors %}
+                                        <div class="text-danger">{{ form.fixed_budget.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.budget_min.id_for_label }}" class="form-label">{{ form.budget_min.label }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        {{ form.budget_min }}
+                                    </div>
+                                    <div class="form-text">{{ form.budget_min.help_text }}</div>
+                                    {% if form.budget_min.errors %}
+                                        <div class="text-danger">{{ form.budget_min.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.budget_max.id_for_label }}" class="form-label">{{ form.budget_max.label }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        {{ form.budget_max }}
+                                    </div>
+                                    <div class="form-text">{{ form.budget_max.help_text }}</div>
+                                    {% if form.budget_max.errors %}
+                                        <div class="text-danger">{{ form.budget_max.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.duration.id_for_label }}" class="form-label">{{ form.duration.label }}</label>
+                                    {{ form.duration }}
+                                    <div class="form-text">{{ form.duration.help_text }}</div>
+                                    {% if form.duration.errors %}
+                                        <div class="text-danger">{{ form.duration.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.deadline.id_for_label }}" class="form-label">{{ form.deadline.label }}</label>
+                                    {{ form.deadline }}
+                                    {% if form.deadline.errors %}
+                                        <div class="text-danger">{{ form.deadline.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Location & Requirements -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Location & Requirements</h3>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_remote }}
+                                        <label class="form-check-label" for="{{ form.is_remote.id_for_label }}">
+                                            {{ form.is_remote.label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.location.id_for_label }}" class="form-label">{{ form.location.label }}</label>
+                                    {{ form.location }}
+                                    <div class="form-text">{{ form.location.help_text }}</div>
+                                    {% if form.location.errors %}
+                                        <div class="text-danger">{{ form.location.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.experience_level.id_for_label }}" class="form-label">{{ form.experience_level.label }}</label>
+                                    {{ form.experience_level }}
+                                    {% if form.experience_level.errors %}
+                                        <div class="text-danger">{{ form.experience_level.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Visibility & Status -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Visibility</h3>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_public }}
+                                        <label class="form-check-label" for="{{ form.is_public.id_for_label }}">
+                                            {{ form.is_public.label }}
+                                        </label>
+                                    </div>
+                                    <div class="form-text">{{ form.is_public.help_text }}</div>
+                                </div>
+                                
+                                {% if form.status %}
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                                        {{ form.status }}
+                                        {% if form.status.errors %}
+                                            <div class="text-danger">{{ form.status.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-2 justify-content-between">
+                            <div>
+                                <a href="{% if object %}{% url 'jobs:job_detail' object.pk %}{% else %}{% url 'jobs:my_jobs' %}{% endif %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                {% if publish_text %}
+                                    <button type="submit" name="publish" class="btn btn-success">
+                                        <i class="bi bi-send"></i> {{ publish_text }}
+                                    </button>
+                                {% endif %}
+                                
+                                {% if close_text %}
+                                    <button type="submit" name="close" class="btn btn-warning">
+                                        <i class="bi bi-lock"></i> {{ close_text }}
+                                    </button>
+                                {% endif %}
+                                
+                                {% if reopen_text %}
+                                    <button type="submit" name="reopen" class="btn btn-info">
+                                        <i class="bi bi-unlock"></i> {{ reopen_text }}
+                                    </button>
+                                {% endif %}
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> {{ submit_text|default:"Save" }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            theme: 'bootstrap-5'
+        });
+        
+        // Handle remote/location logic
+        $('#id_is_remote').change(function() {
+            if($(this).is(':checked')) {
+                $('#id_location').parent().fadeOut();
+            } else {
+                $('#id_location').parent().fadeIn();
+            }
+        });
+        
+        // Trigger initial state
+        $('#id_is_remote').trigger('change');
+        
+        // Fixed budget vs range logic
+        $('#id_fixed_budget, #id_budget_min, #id_budget_max').on('input', function() {
+            if($('#id_fixed_budget').val()) {
+                $('#id_budget_min, #id_budget_max').parent().parent().fadeOut();
+            } else {
+                $('#id_budget_min, #id_budget_max').parent().parent().fadeIn();
+            }
+        });
+        
+        // Trigger initial state
+        $('#id_fixed_budget').trigger('input');
+    });
+</script>
+{% endblock %} 
